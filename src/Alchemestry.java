@@ -15,6 +15,9 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 //не получилось заставить работать JavaFX, поэтому консольный вариант
 //import static sun.security.krb5.Confounder.intValue;
 
@@ -23,7 +26,7 @@ import java.util.Scanner;
 public class Alchemestry {
 
 
-    public static void main(String[] args) {    //TIP Нажмите <shortcut actionId="ShowIntentionActions"/>, когда курсор находится на выделенном тексте
+    public static void main(String[] args) throws Exception {    //TIP Нажмите <shortcut actionId="ShowIntentionActions"/>, когда курсор находится на выделенном тексте
         // чтобы увидеть, как OpenIDE предлагает это исправить.
         Scanner sc = new Scanner(System.in);
 
@@ -49,6 +52,16 @@ public class Alchemestry {
         //помню пожелания про выделение блоков в отдельные функции, но без их унификации особого смысла от этого нет
         //заполняем книгу рецептами из файла book0.txt или book1.txt в зависимости от введенного варианта
 
+        //сюда надо собрать все вещества из исходного файла, чтобы исходное было первым, а конечное последним
+        String[] phrases = {"this is a first sentence",
+                "hello my name is Chris",
+                "what's up man what's up man",
+                "today is tuesday",
+                "this is a very long sentence this is a very long sentence",
+                "single word single word",
+                "hey google hey"};
+        LinkedHashSet<String> substance = new LinkedHashSet<>();
+
 
         //int lineCount = LineCounter.countLines(filePath); // Считаем количество строк
         System.out.println("Количество строк в файле: " + lineCount);
@@ -62,10 +75,11 @@ public class Alchemestry {
                 //надо сделать разбор прочитанной строки.
                 String line = scanner.nextLine();
                 words = line.split("\\s->\\s"); //удаляем разделители
+                System.out.println("исходные данные " + Arrays.toString(words));
                 state[jj][0] = words[0];//сразу через regexp не получилось
                 state[jj][1] = words[1];//сразу через regexp не получилось
 
-                System.out.println("список превращений веществ " + Arrays.toString(words));
+
                 jj++;
             }
         } catch (FileNotFoundException e) {
@@ -86,25 +100,31 @@ public class Alchemestry {
         int k = 0; //счетчик итоговых вариантов рецептов
         int tempIndex = 1; //временный индекс.
 
-        for (int i1 = 1; i1 < lineCount; i1++) {
-            {
-                totalRecept[i1 - 1][0] = stateBefore;
 
-                for (int i2 = 1; i2 < lineCount; i2++) {  //нумерация со сдвигом на 1 так как первая строка в файле заданное условием задачи превращение
-                    if ((totalRecept[i1 - 1][i2 - 1]!=null)&&(totalRecept[i1 - 1][i2 - 1].equals(state[i1][0]))) {
-                        totalRecept[i1 - 1][i2 - 1] = state[i1][1];
-                    } else {
-                        totalRecept[i1 - 1][i2 - 1] += '#';
-                    }
 
-                    //}
-                }
-                System.out.println(Arrays.deepToString(totalRecept));
+
+        System.out.println("список превращений веществ " + Arrays.deepToString(state));
+
+        //заполняем набор элеменитов
+        //substance.addFirst(stateBefore);//если было ранее, становится на первое  место
+        for (int i1=0; i1<state.length; i1++){
+            for (int i2=0; i2<state[0].length; i2++){
+                substance.add(state[i1][i2]);
             }
-
         }
+        substance.addFirst(stateBefore);//если было ранее, становится на первое место
+        substance.addLast(stateAfter); //если было ранее, становится на последнее место
+
+        System.out.println("список всех веществ: " + substance + " количество веществ: " + substance.size());
+        boolean[][] reaction = new boolean[substance.size()][substance.size()];
+
     }
 }
+    //начало блока функций и процедур
+    //------------------------------------------------------------------------------------------------------------------------------------
+
+
+
     //------------------------------------------------------------------------------------------------------
 //не забыть проверить все символы и удалить их после обнаружения требумого условиями задачи вещества
 
